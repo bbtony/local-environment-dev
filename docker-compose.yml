@@ -1,0 +1,41 @@
+version: '3.2'
+
+services:
+  postgresql:
+    image: 'postgres:latest'
+    ports:
+      - '5432:5432'
+    volumes:
+      - './.docker/postgres:/bitnami/postgresql'
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=my_database
+
+  rmq:
+    image: "rabbitmq:3.8-management"
+    hostname: "rmq"
+    container_name: "rmq"
+    environment:
+            #RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+            RABBITMQ_DEFAULT_USER: "admin"
+            RABBITMQ_DEFAULT_PASS: "admin"
+            RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15673:15672"
+      - "5673:5672"
+    volumes: 
+      - ./.docker/rabbit:/var/lib/rabbitmq
+    networks: 
+      - app-network
+
+  cache:
+      image: "redis:5-alpine"
+      hostname: "cache"
+      container_name: app-cache
+      ports: 
+          - "6380:6379"
+      networks:
+          - app-network
+networks: 
+    app-network: {}
